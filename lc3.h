@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 enum {
-  FL_Pos = 1 << 0,
+  FL_POS = 1 << 0,
   FL_ZRO = 1 << 1,
   FL_NEG = 1 << 2,
 };
@@ -15,5 +15,7 @@ typedef struct {
   uint16_t pc;
   uint16_t cond;
 } lc3_cpu;
+
+void lc3_init(lc3_cpu *cpu);
 
 #endif // !LC3_H
