@@ -95,7 +95,6 @@ void lc3_step(lc3_cpu *cpu) {
     uint16_t address = cpu->pc + PCoffset9;
 
     cpu->reg[dr] = cpu->ram[address];
-
     break;
   }
 
@@ -105,9 +104,30 @@ void lc3_step(lc3_cpu *cpu) {
     uint16_t address = cpu->pc + pc_offset;
 
     cpu->ram[address] = cpu->reg[sr];
-
     break;
   }
+
+  case OP_LDR: {
+    uint16_t dr = (instr >> 9) & 0x7;
+    uint16_t baseR = (instr >> 6) & 0x7;
+    uint16_t offset6 = sign_extend(instr & 0x3F, 6);
+    uint16_t address = cpu->reg[baseR] + offset6;
+
+    cpu->reg[dr] = cpu->ram[address];
+    update_flags(cpu, dr);
+    break;
+  }
+
+  case OP_STR: {
+    uint16_t sr = (instr >> 9) & 0x7;
+    uint16_t baseR = (instr >> 6) & 0x7;
+    uint16_t offset6 = sign_extend(instr & 0x3F, 6);
+    uint16_t address = cpu->reg[baseR] + offset6;
+
+    cpu->ram[address] = cpu->reg[sr];
+    break;
+  }
+
   default:
     break;
   }
