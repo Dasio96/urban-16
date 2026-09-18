@@ -72,6 +72,15 @@ void lc3_step(lc3_cpu *cpu) {
     update_flags(cpu, dr);
     break;
   }
+
+  case OP_BR: {
+    uint16_t cond_flgas = (instr >> 9) & 0x7;
+    uint16_t offset9 = sign_extend(instr & 0x1FF, 9);
+
+    if ((cond_flgas & cpu->cond) != 0) {
+      cpu->pc += offset9;
+    }
+  }
   default:
     break;
   }
