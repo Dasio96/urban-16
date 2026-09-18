@@ -77,9 +77,16 @@ void lc3_step(lc3_cpu *cpu) {
     uint16_t cond_flgas = (instr >> 9) & 0x7;
     uint16_t offset9 = sign_extend(instr & 0x1FF, 9);
 
-    if ((cond_flgas & cpu->cond) != 0) {
+    if ((cond_flgas & cpu->cond) != 0)
       cpu->pc += offset9;
-    }
+
+    break;
+  }
+
+  case OP_JMP: {
+    uint16_t baseR = (instr >> 6) & 0x7;
+    cpu->pc = cpu->reg[baseR];
+    break;
   }
   default:
     break;
