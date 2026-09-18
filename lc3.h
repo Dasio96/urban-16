@@ -37,5 +37,8 @@ typedef struct {
 
 void lc3_init(lc3_cpu *cpu);
 void lc3_step(lc3_cpu *cpu);
+void update_flags(lc3_cpu *cpu, uint16_t r);
+
+uint16_t sign_extend(uint16_t x, int bit_count);
 
 #endif // !LC3_H
