@@ -45,6 +45,33 @@ void lc3_step(lc3_cpu *cpu) {
     update_flags(cpu, dr);
     break;
   }
+
+  case OP_AND: {
+    uint16_t dr = (instr >> 9) & 0x7;
+    uint16_t sr1 = (instr >> 6) & 0x7;
+    uint16_t imm_flag = (instr >> 5) & 0x1;
+
+    if (imm_flag == 0) {
+      uint16_t sr2 = instr & 0x7;
+      cpu->reg[dr] = cpu->reg[sr1] & cpu->reg[sr2];
+    } else {
+      uint16_t imm5 = sign_extend(instr & 0x1F, 5);
+      cpu->reg[dr] = cpu->reg[sr1] & imm5;
+    }
+
+    update_flags(cpu, dr);
+    break;
+  }
+
+  case OP_NOT: {
+    uint16_t dr = (instr >> 9) & 0x7;
+    uint16_t sr1 = (instr >> 6) & 0x7;
+
+    cpu->reg[dr] = ~cpu->reg[sr1];
+
+    update_flags(cpu, dr);
+    break;
+  }
   default:
     break;
   }
