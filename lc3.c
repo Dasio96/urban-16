@@ -160,6 +160,20 @@ void lc3_step(lc3_cpu *cpu) {
     break;
   }
 
+  case OP_JSR: {
+    uint16_t flag = (instr >> 11) & 0x1;
+
+    if (flag) {
+      uint16_t offset11 = sign_extend(instr & 0x1FF, 11);
+      cpu->pc += offset11;
+    } else {
+      uint16_t baseR = (instr >> 6) & 0x7;
+      cpu->pc = cpu->reg[baseR];
+    }
+
+    break;
+  }
+
   default:
     break;
   }
