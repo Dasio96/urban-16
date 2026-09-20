@@ -10,6 +10,30 @@ uint16_t sign_extend(uint16_t x, int bit_count) {
   return x;
 }
 
+static uint16_t swap16(uint16_t val) { return (val << 8) | (val >> 8); }
+
+int lc3_load_image(lc3_cpu *cpu, const char *image_path) {
+  FILE *file = fopen(image_path, "rb");
+  if (!file)
+    return 0;
+
+  uint16_t origin;
+  if (fread(&origin, sizeof(uint16_t), 1, file) != 1) {
+    fclose(file);
+    return 0;
+  }
+
+  origin = swap16(origin);
+
+  uint16_t word;
+  while (fread(&word, sizeof(uint16_t), 1, file) == 1) {
+    cpu->ram[origin++] = swap16(word);
+  }
+
+  fclose(file);
+  return 1;
+}
+
 void update_flags(lc3_cpu *cpu, uint16_t r) {
   if (cpu->reg[r] == 0)
     cpu->cond = FL_ZRO;
