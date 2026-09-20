@@ -128,6 +128,29 @@ void lc3_step(lc3_cpu *cpu) {
     break;
   }
 
+  case OP_LDI: {
+    uint16_t dr = (instr >> 9) & 0x7;
+    uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
+    uint16_t ptr = cpu->pc + pc_offset;
+    uint16_t real_address = cpu->ram[ptr];
+
+    cpu->reg[dr] = cpu->ram[real_address];
+
+    update_flags(cpu, dr);
+    break;
+  }
+
+  case OP_STI: {
+    uint16_t sr = (instr >> 9) & 0x7;
+    uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
+    uint16_t ptr = cpu->pc + pc_offset;
+    uint16_t real_address = cpu->ram[ptr];
+
+    cpu->ram[real_address] = cpu->reg[sr];
+
+    break;
+  }
+
   default:
     break;
   }
