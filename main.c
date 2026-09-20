@@ -1,23 +1,19 @@
 #include "lc3.h"
 #include <stdio.h>
 
-int main(void) {
+int main(int argc, const char *argv[]) {
+  if (argc < 2) {
+    printf("%s\n", argv[0]);
+    return 1;
+  }
+
   lc3_cpu cpu;
   lc3_init(&cpu);
 
-  uint16_t start_address = 0x3000;
-
-  cpu.ram[start_address + 0] = 0xE002;
-  cpu.ram[start_address + 1] = 0xF022;
-  cpu.ram[start_address + 2] = 0xF025;
-
-  cpu.ram[start_address + 3] = 'U';
-  cpu.ram[start_address + 4] = 'R';
-  cpu.ram[start_address + 5] = 'B';
-  cpu.ram[start_address + 6] = 'A';
-  cpu.ram[start_address + 7] = 'N';
-  cpu.ram[start_address + 8] = '\n';
-  cpu.ram[start_address + 9] = '\0';
+  if (!lc3_load_image(&cpu, argv[1])) {
+    printf("failed to load image %s\n", argv[1]);
+    return 1;
+  }
 
   while (cpu.running) {
     lc3_step(&cpu);
