@@ -1,4 +1,6 @@
 #include "lc3.h"
+#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 uint16_t sign_extend(uint16_t x, int bit_count) {
@@ -21,6 +23,7 @@ void lc3_init(lc3_cpu *cpu) {
   memset(cpu, 0, sizeof(lc3_cpu));
   cpu->pc = 0x3000;
   cpu->cond = FL_ZRO;
+  cpu->running = 1;
 }
 
 void lc3_step(lc3_cpu *cpu) {
@@ -171,6 +174,78 @@ void lc3_step(lc3_cpu *cpu) {
       cpu->pc = cpu->reg[baseR];
     }
 
+    break;
+  }
+
+  case OP_TRAP: {
+    cpu->reg[7] = cpu->pc;
+    uint16_t trapvec = instr & 0xFF;
+
+    switch (trapvec) {
+    case TRAP_GETC:
+      cpu->reg[0] = (uint16_t)getchar();
+      update_flags(cpu, 0);
+      break;
+
+    case TRAP_OUT:
+      putc((char)cpu->reg[0], stdout);
+      fflush(stdout);
+      break;
+
+    case TRAP_PUTS: {
+      uint16_t address = cpu->reg[0];
+
+      while (cpu->ram[address] != 0x0000) {
+        putc((char)cpu->ram[address], stdout);
+        address++;
+      }
+
+      fflush(stdout);
+      break;
+    }
+
+    case TRAP_IN: {
+      printf("Enter a character: ");
+      fflush(stdout);
+      char c = (char)getchar();
+      putc(c, stdout);
+      fflush(stdout);
+      cpu->reg[0] = (uint16_t)c;
+      update_flags(cpu, 0);
+      break;
+    }
+
+    case TRAP_PUTSP: {
+      uint16_t address = cpu->reg[0];
+
+      while (cpu->ram[address] != 0x0000) {
+        uint16_t word = cpu->ram[address];
+
+        char c1 = (char)(word & 0xFF);
+        if (c1 == '\0')
+          break;
+        putc(c1, stdout);
+
+        char c2 = (char)(word >> 8);
+        if (c2 != '\0') {
+          putc(c2, stdout);
+        }
+
+        address++;
+      }
+
+      fflush(stdout);
+      break;
+    }
+    case TRAP_HALT:
+      puts("\n--- HALT ---");
+      fflush(stdout);
+      cpu->running = 0;
+      break;
+
+    default:
+      break;
+    }
     break;
   }
 

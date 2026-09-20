@@ -28,11 +28,21 @@ enum {
   OP_TRAP
 };
 
+typedef enum {
+  TRAP_GETC = 0x20,
+  TRAP_OUT = 0x21,
+  TRAP_PUTS = 0x22,
+  TRAP_IN = 0x23,
+  TRAP_PUTSP = 0x24,
+  TRAP_HALT = 0x25
+} lc3_trap_code;
+
 typedef struct {
   uint16_t ram[65536];
   uint16_t reg[8];
   uint16_t pc;
   uint16_t cond;
+  int running;
 } lc3_cpu;
 
 void lc3_init(lc3_cpu *cpu);
