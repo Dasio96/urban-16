@@ -151,6 +151,15 @@ void lc3_step(lc3_cpu *cpu) {
     break;
   }
 
+  case OP_LEA: {
+    uint16_t dr = (instr >> 9) & 0x7;
+    uint16_t address = cpu->pc + sign_extend(instr & 0x1FF, 9);
+    cpu->reg[dr] = address;
+
+    update_flags(cpu, dr);
+    break;
+  }
+
   default:
     break;
   }
